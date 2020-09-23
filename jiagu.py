@@ -175,7 +175,7 @@ def main(filepath = None):
 	shutil.copyfile(input_filename, 'Target.apk')
 
 	# Step1: 反编译目标app
-	out = subprocess.Popen('apktool.bat d Target.apk', stdout=subprocess.PIPE).stdout.read()
+	out = subprocess.Popen('java -jar ./apktool.jar d Target.apk',shell=True, stdout=subprocess.PIPE).stdout.read()
 
 	if out.find('error') > 0 or out.find('exception') > 0:
 		print '[Error] apktool decompiled error!'
@@ -202,7 +202,7 @@ def main(filepath = None):
 		recompile_TuokeApk_Project(applicationName)
 		# Step3: 复制smali文件夹，跟反编译后的app下的smali合并
 		print '[+] Copy smali folder into Target folder...'
-		out = subprocess.Popen('cp -rf smali Target/', stdout=subprocess.PIPE).stdout.read()
+		out = subprocess.Popen('cp -rf smali Target/',shell=True, stdout=subprocess.PIPE).stdout.read()
 
 	# Step4: 修改manifest文件，将自定义Application设定为“org.hackcode.ProxyApplication”
 	print '[+] Modified AndroidManifest.xml...'
@@ -212,7 +212,7 @@ def main(filepath = None):
 	file_handle.close()
 
 	# Step5: 重打包目标app
-	out = subprocess.Popen('apktool.bat b Target', stdout=subprocess.PIPE).stdout.read()
+	out = subprocess.Popen('java -jar ./apktool.jar b Target',shell=True, stdout=subprocess.PIPE).stdout.read()
 	if out.find('error') > 0 or out.find('exception') > 0:
 		print '[Error] apktool recompiled error!'
 		return
@@ -234,7 +234,7 @@ def main(filepath = None):
 	
 	# Step7: 合并TuokeApk/bin/classes.dex和TargetApk.zip(加固),生成classes.dex
 	shutil.copyfile('TuokeApk/app/build/intermediates/transforms/dex/release/folders/1000/1f/main/classes.dex', 'tuoke.dex')
-	subprocess.Popen('java -jar JiaguApk.jar tuoke.dex TargetApk.zip', stdout=subprocess.PIPE).stdout.read()
+	subprocess.Popen('java -jar JiaguApk.jar tuoke.dex TargetApk.zip',shell=True, stdout=subprocess.PIPE).stdout.read()
 
 	# Step8: 将合并生成的新classes.dex文件与Target.modified.apk中的classes.dex替换
 	print '[+] Replace \"%s\" with \"classes.dex\"' % (extracted_dir + '/classes.dex', )
@@ -263,7 +263,7 @@ def main(filepath = None):
 	# Step11: 签名
 	print '[+] Signning...'
 	output_filename = input_filename[:input_filename.rfind('apk')] + 'signed.apk'
-	out = subprocess.Popen('java -jar sign/signapk.jar sign/testkey.x509.pem sign/testkey.pk8 Target.modified.2.apk ' + output_filename, stdout=subprocess.PIPE).stdout.read()
+	out = subprocess.Popen('java -jar sign/signapk.jar sign/testkey.x509.pem sign/testkey.pk8 Target.modified.2.apk ' + output_filename,shell=True, stdout=subprocess.PIPE).stdout.read()
 	clean()
 
 if __name__ == '__main__':
